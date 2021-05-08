@@ -1,6 +1,8 @@
 package console;
 
-import java.util.List;
+import console.expression.ArithmeticExpression;
+import console.expression.Expression;
+import console.expression.RomanExpression;
 
 /**
  * Класс принимает в себя введенную пользователем строку, разбивает на составные части,
@@ -9,24 +11,20 @@ import java.util.List;
  */
 public class ExpressionHandler {
     private final String inputString;
-    private final ArithmeticExpression expression = new ArithmeticExpression();
-    private boolean arabic;
+    private Expression expression;
 
     public ExpressionHandler(String inputString) {
         this.inputString = inputString;
+        decompose();
     }
 
     /**
      * Метод возвращает ответ в соответствующей запросу системе счисления.
+     *
      * @return решение арифметического выражения в формате String.
      */
-    public String giveAnswer()  {
-        decompose();
-        if (arabic) {
-            return String.valueOf(expression.calculate());
-        } else {
-            return intToRoman(expression.calculate());
-        }
+    public String giveAnswer() {
+        return expression.calculate();
     }
 
     /**
@@ -41,9 +39,9 @@ public class ExpressionHandler {
         }
 
         if (isArabic(strings[0]) && isArabic(strings[2])) {
-            arabic = true;
+            expression = new ArithmeticExpression();
         } else if (!isArabic(strings[0]) && !isArabic(strings[2])) {
-            arabic = false;
+            expression = new RomanExpression(new ArithmeticExpression());
         } else throw new ArithmeticException("Оба числа должны быть в одной системе счисления");
 
         switch (strings[1]) {
@@ -53,14 +51,8 @@ public class ExpressionHandler {
             case "-" -> expression.setOperation(Operation.Delete);
             default -> throw new UnsupportedOperationException("Неподдерживаемая операция над числами.");
         }
-
-        if (arabic) {
-            expression.setNumber1(Integer.parseInt(strings[0]));
-            expression.setNumber2(Integer.parseInt(strings[2]));
-        } else {
-            expression.setNumber1(romanToInt(strings[0]));
-            expression.setNumber2(romanToInt(strings[2]));
-        }
+        expression.setNumber1(strings[0]);
+        expression.setNumber2(strings[2]);
     }
 
     /**
@@ -78,65 +70,5 @@ public class ExpressionHandler {
         return true;
     }
 
-    /**
-     * Метод переводит число в римской системе счисления в арабскую.
-     *
-     * @param input строка содержащая римское число.
-     * @return целое арабское число сконвертированное из римского.
-     * @throws IllegalArgumentException в случае невозможности конвертации.
-     */
-    private int romanToInt(String input)  {
-        String romanNumeral = input.toUpperCase();
-        int result = 0;
 
-        List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
-
-        int i = 0;
-
-        while ((romanNumeral.length() > 0) && (i < romanNumerals.size())) {
-            RomanNumeral symbol = romanNumerals.get(i);
-            if (romanNumeral.startsWith(symbol.name())) {
-                result += symbol.getValue();
-                romanNumeral = romanNumeral.substring(symbol.name().length());
-            } else {
-                i++;
-            }
-        }
-
-        if (romanNumeral.length() > 0) {
-            throw new IllegalArgumentException(input + " не может быть сконвертировано в римское число");
-        }
-
-        return result;
-    }
-
-    /**
-     * Метод принимает на вход арабское число и переводит его в римскую систему счисления.
-     *
-     * @param number целое десятичное число в диапазоне 0 - 4000.
-     * @return Римское число в формате String.
-     * @throws IllegalArgumentException в случае выхода за диапазон.
-     */
-    private String intToRoman(int number) {
-        if ((number <= 0) || (number > 4000)) {
-            throw new IllegalArgumentException(number + " выходит за диапазон римских чисел");
-        }
-
-        List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
-
-        int i = 0;
-        StringBuilder sb = new StringBuilder();
-
-        while ((number > 0) && (i < romanNumerals.size())) {
-            RomanNumeral currentSymbol = romanNumerals.get(i);
-            if (currentSymbol.getValue() <= number) {
-                sb.append(currentSymbol.name());
-                number -= currentSymbol.getValue();
-            } else {
-                i++;
-            }
-        }
-
-        return sb.toString();
-    }
 }

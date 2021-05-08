@@ -32,4 +32,67 @@ public enum RomanNumeral {
                 .sorted(Comparator.comparing((RomanNumeral e) -> e.value).reversed())
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Метод переводит число в римской системе счисления в арабскую.
+     *
+     * @param input строка содержащая римское число.
+     * @return целое арабское число сконвертированное из римского.
+     * @throws IllegalArgumentException в случае невозможности конвертации.
+     */
+    public static String romanToInt(String input) {
+        String romanNumeral = input.toUpperCase();
+        int result = 0;
+
+        List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
+
+        int i = 0;
+
+        while ((romanNumeral.length() > 0) && (i < romanNumerals.size())) {
+            RomanNumeral symbol = romanNumerals.get(i);
+            if (romanNumeral.startsWith(symbol.name())) {
+                result += symbol.getValue();
+                romanNumeral = romanNumeral.substring(symbol.name().length());
+            } else {
+                i++;
+            }
+        }
+
+        if (romanNumeral.length() > 0) {
+            throw new IllegalArgumentException(input + " не может быть сконвертировано в римское число");
+        }
+
+        return String.valueOf(result);
+    }
+
+    /**
+     * Метод принимает на вход арабское число и переводит его в римскую систему счисления.
+     *
+     * @param input целое десятичное число в диапазоне 0 - 4000.
+     * @return Римское число в формате String.
+     * @throws IllegalArgumentException в случае выхода за диапазон.
+     */
+    public static String intToRoman(String input) {
+        int number = Integer.parseInt(input);
+        if ((number <= 0) || (number > 4000)) {
+            throw new IllegalArgumentException(number + " выходит за диапазон римских чисел");
+        }
+
+        List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
+
+        int i = 0;
+        StringBuilder sb = new StringBuilder();
+
+        while ((number > 0) && (i < romanNumerals.size())) {
+            RomanNumeral currentSymbol = romanNumerals.get(i);
+            if (currentSymbol.getValue() <= number) {
+                sb.append(currentSymbol.name());
+                number -= currentSymbol.getValue();
+            } else {
+                i++;
+            }
+        }
+
+        return sb.toString();
+    }
 }
