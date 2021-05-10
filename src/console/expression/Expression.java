@@ -2,6 +2,9 @@ package console.expression;
 
 import console.Operation;
 
+/**
+ * Интерфейс определяющий основное поведение выражений для сознадия оболочек в разных счисления.
+ */
 public interface Expression {
     String calculate();
 

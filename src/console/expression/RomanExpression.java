@@ -5,6 +5,9 @@ import console.RomanNumeral;
 import console.expression.ArithmeticExpression;
 import console.expression.Expression;
 
+/**
+ * Класс-оболочка для римских чисел.
+ */
 public class RomanExpression implements Expression {
     final private ArithmeticExpression wrapped;
 
